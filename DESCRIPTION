@@ -1,0 +1,16 @@
+Package: retvod
+Type: Package
+Title: Retrieve vegetation optical depth (VOD) from tower based radiometer
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Marvin", "Browne",
+      email = "brownegm@gmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: Includes a collection of function and helpers for performing a test retrieval
+    Continuation lines should be indented.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
