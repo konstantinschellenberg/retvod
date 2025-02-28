@@ -6,22 +6,24 @@
 #' @param Tair Air temperature in deg Kelvin
 #' @param Tsoil Soil temperature in deg Kelvin
 #' @param omega Impediance of canopy?
-#' @param noT Do you want to only calculate the emissitivity?
+#' @param emiss Do you want to only calculate the emissitivity?
 # @param rtms
 #'
 #' @returns Vector of brightness temperatures
 #' @export
 #'
-tau_omega <- function(r, rhfac, gamma, Tair, Tsoil, omega, noT = F) {
+tau_omega <- function(r, rhfac, gamma, Tair=NULL, Tsoil=NULL, omega, emiss = F) {
 
+if(emiss == F){
   # calculate rough fresnel reflectivity
   r_rough <- rhfac * r
   # calculate the soil-associated brightness temperature
-  tbs <- (1 - rhfac * r) * gamma * Tsoil
+  tbs <- (1 - r_rough) * gamma * Tsoil
   # calculate the canopy-associated brightness temperature
-  tbc <- (1 - omega) * (1 - gamma) * (1 + ((rhfac * r) * gamma)) * Tair
+  tbc <- (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma)) * Tair
   # calculate the total brightness temperature
   totaltb <- tbs + tbc
+
   # return the soil and canopy brightness temperatures and the total brightness temperature
   invisible(structure(
     list(tbs, tbc, totaltb),
@@ -36,17 +38,34 @@ tau_omega <- function(r, rhfac, gamma, Tair, Tsoil, omega, noT = F) {
     ),
     class = "tb"
   ))
-  #
-#   if (rtms) {
-#
-#     tb <- RTMS_tb(r = r, rhfac = rhfac, gamma = gamma, Tsoil = Tsoil, Tveg = Tair, omega = omega)[[4]]
-#     return(tb)
-#
-#   } else if (noT == TRUE) {
-#     r_rough <- rhfac * r
-#     return((1 - r_rough) * gamma + (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma)))
-#   }
+
+}else{
+
+    r_rough <- rhfac * r
+    emissivity <- (1 - r_rough) * gamma + (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma))
+    # return the soil and canopy brightness temperatures and the total brightness temperature
+    return(structure(
+      list(emissivity),
+      .Names = "emissivity",
+      inputs = list(
+        r = r,
+        rhfac = rhfac,
+        gamma = gamma,
+        Tsoil = Tsoil,
+        Tair = Tair,
+        omega = omega
+      )
+    ))
+  }  
+
 }
+#   #
+# #   if (rtms) {
+# #
+# #     tb <- RTMS_tb(r = r, rhfac = rhfac, gamma = gamma, Tsoil = Tsoil, Tveg = Tair, omega = omega)[[4]]
+# #     return(tb)
+
+# }
 
 
 #' @export

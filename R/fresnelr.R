@@ -1,14 +1,22 @@
 #' Fresnel's reflectivity calculation
 #'
 #' @param eps Dielectric
-#' @param theta Incidence angle
+#' @param theta Incidence angle in degrees
 #'
 #' @return List of horizontal and vertical polarization reflectivity
 #' @export
 #'
 fresnelr <- function(eps, theta){
+
+  if (Re(eps)<0|Im(eps)==0){
+    stop("fresnelr: Invalid epsilon value.")
+  }
+
+  stopifnot(theta>0)# no negative angles
+
   # theta is converted to radians
   thetar = theta*pi/180
+  
   # calculate cos(theta) and sin2(theta)
   costheta = cos(thetar)
   sin2theta = sin(thetar)^2

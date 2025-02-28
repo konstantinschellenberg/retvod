@@ -9,7 +9,7 @@ fresnelr(eps, theta)
 \arguments{
 \item{eps}{Dielectric}
 
-\item{theta}{Incidence angle}
+\item{theta}{Incidence angle in degrees}
 }
 \value{
 List of horizontal and vertical polarization reflectivity

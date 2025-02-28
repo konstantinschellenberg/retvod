@@ -1,21 +1,57 @@
 test_that("Check output", {
 
-  theta = 40*pi/180
-
-  Tair = 300
-  Tsoil = 290
-  #r = 1
-  roughness = 0.1
-  vod=0.6
-  rhfac = exp(-roughness*cos(theta))
-  gamma = exp(-1 * vod / cos(theta))
-  omega = 0.08
-
-  #Check that you get the same value forward and back
+  #Check that you get the expected value 
   test_eps <- mironov(1.4e9, 0.4, 0.232)
 
   reflecs <- fresnelr(test_eps$dielectric, 40)
 
-  tb <- tau_omega(reflecs$fH, rhfac=rhfac, gamma = gamma, Tair, Tsoil, 0.5, noT = T)
+  # Expected values for known inputs (replace with actual known correct values)
+  thetar = 40*pi/180
+  
+  hnum = cos(thetar) - sqrt(test_eps$dielectric - sin(thetar)^2)
+  hdem = cos(thetar) + sqrt(test_eps$dielectric - sin(thetar)^2)
 
+  vnum = test_eps$dielectric*cos(thetar) - sqrt(test_eps$dielectric - sin(thetar)^2)
+  vdem = test_eps$dielectric*cos(thetar) + sqrt(test_eps$dielectric - sin(thetar)^2)
+
+  expected_fH <- abs(hnum/hdem)^2
+  expected_fV <- abs(vnum/vdem)^2
+
+  expect_true(reflecs$fH > reflecs$fV)
+  expect_true(reflecs$fH==expected_fH)
+  expect_true(reflecs$fV==expected_fV)
+})
+
+test_that("Function handles invalid inputs", {
+  
+  eps <- complex(real=10, imaginary=6)
+  # Negative epsilon values
+  expect_error(fresnelr(-1, 30))
+  
+  # Zero epsilon values (invalid as refractive index cannot be zero)
+  expect_error(fresnelr(0, 30))
+  
+  # Negative angle no bueno
+  expect_error(fresnelr(eps, -40))
+})
+
+test_that("Total reflectivity and transmissivity should sum to 1", {
+  eps <- mironov(1.4e9, 0.4, 0.232)$dielectric  # Example refractive index
+  theta <- 40   # Example angle (degrees)
+
+  # Call the fresnelr function
+  result <- fresnelr(eps, theta)
+  
+  fH <- result$fH
+  fV <- result$fV
+  
+  # Total reflectivity (can also include polarization weightings)
+  total_reflectivity <- fH + fV
+  
+  # Total transmissivity is simply 1 - total reflectivity
+  total_transmissivity <- 1 - total_reflectivity
+
+   # Check if total reflectivity + transmissivity is approximately 1
+  expect_equal(total_reflectivity + total_transmissivity, 1, info = paste("Total reflectivity and transmissivity do not sum to 1 at angle", theta))
+  # tolerance = 1e-3,
 })

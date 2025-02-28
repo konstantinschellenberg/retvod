@@ -4,7 +4,7 @@
 \alias{tau_omega}
 \title{Tau-omega model}
 \usage{
-tau_omega(r, rhfac, gamma, Tair, Tsoil, omega, noT = F)
+tau_omega(r, rhfac, gamma, Tair = NULL, Tsoil = NULL, omega, emiss = F)
 }
 \arguments{
 \item{r}{Fresnel reflectivity}
@@ -19,7 +19,7 @@ tau_omega(r, rhfac, gamma, Tair, Tsoil, omega, noT = F)
 
 \item{omega}{Impediance of canopy?}
 
-\item{noT}{Do you want to only calculate the emissitivity?}
+\item{emiss}{Do you want to only calculate the emissitivity?}
 }
 \value{
 Vector of brightness temperatures
