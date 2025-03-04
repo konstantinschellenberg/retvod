@@ -7,15 +7,23 @@
 estTb(tbH, tbV, fH, fV, gamma, Tair, Tsoil, omega, rhfac)
 }
 \arguments{
+\item{tbH}{Observed horizontally polarized brightness temperature}
+
+\item{tbV}{Observed vertically polarized brightness temperature}
+
 \item{fH}{Estimated horizontal fresnel reflectivity}
 
 \item{fV}{Estimated vertical fresnel reflectivity}
 
-\item{rhfac}{}
+\item{gamma}{Transfer function}
 
-\item{TbH}{Observed horizontally polarized brightness temperature}
+\item{Tair}{Air temperature}
 
-\item{TbV}{Observed vertically polarized brightness temperature}
+\item{Tsoil}{Soil temperature}
+
+\item{omega}{Canopy opacity}
+
+\item{rhfac}{Roughness factor}
 }
 \value{
 Vertical and horizontally polarized brightness temperatures

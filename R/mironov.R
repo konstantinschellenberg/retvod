@@ -10,11 +10,14 @@
 #'
 mironov <- function(f, smv, cf) {
 
-  fcheck <- f <= 1 * 10^9
+  fcheck <- f <= 1e9
   smcheck <- smv <= 0 | smv >= 1
   cfcheck <- cf <= 0 | cf >= 1
 
   if (fcheck | smcheck | cfcheck) {
+    cat("\nfcheck =", fcheck,"\n",
+              "smcheck =", smcheck, "\n",
+              "cfcheck =", cfcheck, "\n")
     stop("mironov: Check input---Data falls outside of acceptable range.")
   }
   # Constants
