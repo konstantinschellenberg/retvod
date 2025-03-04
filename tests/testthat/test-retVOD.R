@@ -29,15 +29,26 @@ air <- c(291.32, 291.3, 290.2,
 soil <- air * 0.90
 
 set.seed(2)
-sm <- retvod:::gen_sin(200, rangeL = 0.2, rangeH=0.35)|>sample(size= 7)
-
+sm <- retvod:::gen_sin(1000, rangeL = 0.2, rangeH=0.35)|>sample(size= 7)
 vod <- sm * 2
 inc_angle = 40
-sol2 <- solveSmVod(smc = sm, vod = vod, tbH = h[4], tbV = v[4],
+
+sol2 <- solveSmVod(smc = sm[4], vod = vod, tbH = h[4], tbV = v[4],
                    Tair = air[4], Tsoil = soil[4],
                    omega = 0.5, clay_frac = 0.232,
                    roughness = 0.1, inc_angle = 40,
-                   mat = F)
+                   mat = T)
 
+expect_equal(min(sol2$cf_mat), sol2$cf_tb)
+expect_equal(sol2$sm_est, sm[4])
+
+solved_vod <- sol2$vod_est
+input_sm <- sm[4]
+
+sol2_back <- solveSmVod(smc = sm, vod = solved_vod, tbH = h[4], tbV = v[4],
+                        Tair = air[4], Tsoil = soil[4],
+                        omega = 0.5, clay_frac = 0.232,
+                        roughness = 0.1, inc_angle = 40,
+                        mat = T)
 
 })

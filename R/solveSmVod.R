@@ -46,7 +46,7 @@ solveSmVod <- function(smc,
   # array to hold residuals and predictions for each epsilon and gamma
   results <- array(NA,
     dim = c(num_eps, num_vod, 5), # rows, columns, calc values
-    dimnames = list(NULL, NULL, c("pred_tbH", "pred_tbV", "cf_total", "cf_tbH", "cf_tbV"))
+    dimnames = list(smc, vod, c("pred_tbH", "pred_tbV", "cf_total", "cf_tbH", "cf_tbV"))
   )
 
   ## Compute cost function for all combinations of epsilon and VOD
@@ -76,21 +76,27 @@ solveSmVod <- function(smc,
     arr.ind = TRUE
   )
 
-  vod_solution <- vod[min_index[2]]
+  if(length(smc)==1){
+    row <- 1
+    col <- min_index
+  }else{
+    row <- min_index[1]
+    col <- min_index[2]
+  }
 
   output <- list(
     min_cf_index = min_index,
-    cf_tb = results[min_index[1], min_index[2], "cf_total"]|>unname(),
-    epsilon = eps_list[min_index[1]],
-    pred_tbH = results[min_index[1], min_index[2], "pred_tbH"]|>unname(),
-    pred_tbV = results[min_index[1], min_index[2], "pred_tbV"]|>unname(),
-    cf_tbH = results[min_index[1], min_index[2], "cf_tbH"]|>unname(),
-    cf_tbV = results[min_index[1], min_index[2], "cf_tbV"]|>unname(),
-    sm_est = smc[min_index[1]],
-    vod_est = vod_solution,
-    cf_mat = if (mat == T) results[, , "cf_total"]
+    cf_tb = results[row, col, "cf_total"]|>unname(),
+    epsilon = eps_list[row],
+    pred_tbH = results[row, col, "pred_tbH"]|>unname(),
+    pred_tbV = results[row, col, "pred_tbV"]|>unname(),
+    cf_tbH = results[row, col, "cf_tbH"]|>unname(),
+    cf_tbV = results[row, col, "cf_tbV"]|>unname(),
+    sm_est = smc[row],
+    vod_est = vod[col],
+    cf_mat = if (mat == T) results[, , "cf_total"] else NA
   )
   return(structure(output,
-                   flag = if (nrow(min_index>1)) "Tie for lowest residuals found")
+                   flag = if (length(row)>1) "Tie for lowest residuals found")
   )
 }
