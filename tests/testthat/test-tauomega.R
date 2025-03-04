@@ -22,12 +22,13 @@ tb <- tau_omega(
   omega = omega,
   emiss = F
 )
-  
+
 emiss <- tau_omega(
   r = rH,
   rhfac = rhfac,
   gamma = gamma,
   omega = omega,
+
   emiss = T
 )
 # check class

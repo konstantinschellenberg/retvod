@@ -17,7 +17,7 @@ tau_omega(r, rhfac, gamma, Tair = NULL, Tsoil = NULL, omega, emiss = F)
 
 \item{Tsoil}{Soil temperature in deg Kelvin}
 
-\item{omega}{Impediance of canopy?}
+\item{omega}{Scattering albedo}
 
 \item{emiss}{Do you want to only calculate the emissitivity?}
 }

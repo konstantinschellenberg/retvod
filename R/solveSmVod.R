@@ -10,6 +10,7 @@
 #' @param inc_angle Incidence angle
 #' @param clay_frac Clay fraction
 #' @param roughness Roughness estimate
+#' @param mat TRUE returns the cost function matrix
 #'
 #' @description This function uses the a range of input soil moisture and vod values to solve for the best VOD value given the air, soil, and observed brightness temperatures.
 #' @details The function returns the predicted brightness temperatures (i.e., using tau-omega), residuals for each polarization, and the predicted soil moisture and VOD. Mironov is used to determine the dielectric constant for a given soil moisture and has a set frequency of 1.4e9Hz (for L-band). Also the clay fraction at MOFLUX is 23.2%.
@@ -24,20 +25,14 @@ solveSmVod <- function(smc,
                        omega, inc_angle,
                        clay_frac = 0.232, roughness, mat=F) {
 
-  ## calculate epsilon (dielectric) for each value of soil moisture
-  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-
-  ## calculate fresnel h and v polarization reflectivities
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle), simplify = TRUE)
-  fH <- reflecs["fH", ] |> unlist() # Extract Horizontal Reflectivity
-  fV <- reflecs["fV", ] |> unlist() # Extract Vertical Reflectivity
-
-  ## calculate gamma
+  ## calculate gamma and roughness factor
   cosTheta <- cos(inc_angle * (pi / 180))
   gamma <- exp(-1 * (vod / cosTheta))
-
-  ## apply roughness correction
   rhfac <- exp(-roughness * cosTheta) # could be squared here
+
+  ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
+  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
+  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle), simplify = F)
 
   ## initialize output matrices
   num_eps <- length(eps_list) # number of dielectric values
@@ -50,23 +45,25 @@ solveSmVod <- function(smc,
   )
 
   ## Compute cost function for all combinations of epsilon and VOD
-  for (e in seq_along(fH)) {
-    for (g in seq_along(gamma)) {
+  for (e in seq_along(smc)) {
+    for (g in seq_along(vod)) {
       result <- estTb(
         tbH = tbH, tbV = tbV,
-        fH = fH[e], fV = fV[e], gamma = gamma[g],
+        fH = reflecs[[e]][["fH"]], fV = reflecs[[e]][["fH"]], gamma = gamma[g],
         rhfac = rhfac,
         Tair = Tair,
         Tsoil = Tsoil,
         omega = omega
       )
       # store results
-      results[e, g, "pred_tbH"] <- result$pred_tbH
-      results[e, g, "pred_tbV"] <- result$pred_tbV
-
-      results[e, g, "cf_total"] <- result$residuals$totaltb
-      results[e, g, "cf_tbH"] <- result$residuals$tbH
-      results[e, g, "cf_tbV"] <- result$residuals$tbV
+      results[e,g, ] <- c(result$pred_tbH, result$pred_tbV, result$residuals$totaltb,
+                          result$residuals$tbH, result$residuals$tbV)
+      # results[e, g, "pred_tbH"] <- result$pred_tbH
+      # results[e, g, "pred_tbV"] <- result$pred_tbV
+      #
+      # results[e, g, "cf_total"] <- result$residuals$totaltb
+      # results[e, g, "cf_tbH"] <- result$residuals$tbH
+      # results[e, g, "cf_tbV"] <- result$residuals$tbV
     }
   }
 
@@ -77,26 +74,29 @@ solveSmVod <- function(smc,
   )
 
   if(length(smc)==1){
-    row <- 1
-    col <- min_index
+    best_row <- 1
+    best_col <- min_index
+  }else if (length(vod)==1){
+    best_row <- min_index
+    best_col <- 1
   }else{
-    row <- min_index[1]
-    col <- min_index[2]
+    best_row <- min_index[1]
+    best_col <- min_index[2]
   }
 
   output <- list(
     min_cf_index = min_index,
-    cf_tb = results[row, col, "cf_total"]|>unname(),
-    epsilon = eps_list[row],
-    pred_tbH = results[row, col, "pred_tbH"]|>unname(),
-    pred_tbV = results[row, col, "pred_tbV"]|>unname(),
-    cf_tbH = results[row, col, "cf_tbH"]|>unname(),
-    cf_tbV = results[row, col, "cf_tbV"]|>unname(),
-    sm_est = smc[row],
-    vod_est = vod[col],
+    cf_tb = results[best_row, best_col, "cf_total"]|>unname(),
+    epsilon = eps_list[best_row],
+    pred_tbH = results[best_row, best_col, "pred_tbH"]|>unname(),
+    pred_tbV = results[best_row, best_col, "pred_tbV"]|>unname(),
+    cf_tbH = results[best_row, best_col, "cf_tbH"]|>unname(),
+    cf_tbV = results[best_row, best_col, "cf_tbV"]|>unname(),
+    sm_est = smc[best_row],
+    vod_est = vod[best_col],
     cf_mat = if (mat == T) results[, , "cf_total"] else NA
   )
   return(structure(output,
-                   flag = if (length(row)>1) "Tie for lowest residuals found")
+                   flag = if (length(best_row)>1) "Tie for lowest residuals found")
   )
 }

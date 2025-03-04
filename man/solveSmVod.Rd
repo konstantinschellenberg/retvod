@@ -38,6 +38,8 @@ solveSmVod(
 \item{clay_frac}{Clay fraction}
 
 \item{roughness}{Roughness estimate}
+
+\item{mat}{TRUE returns the cost function matrix}
 }
 \value{
 List of predicted brightness temperatures, soil moisture and VOD:

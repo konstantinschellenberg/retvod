@@ -11,6 +11,8 @@ retVOD(tbH, tbV, smc, vod, Tair, Tsoil, omega, roughness, inc_angle)
 
 \item{tbV}{Vertical brightness temperatures}
 
+\item{smc}{Soil moisture}
+
 \item{vod}{VOD estimate}
 
 \item{Tair}{Air temperature}
@@ -22,8 +24,6 @@ retVOD(tbH, tbV, smc, vod, Tair, Tsoil, omega, roughness, inc_angle)
 \item{roughness}{Soil roughness estimate}
 
 \item{inc_angle}{Incidence angle}
-
-\item{sm}{Soil moisture}
 }
 \value{
 Retrieved VOD and auxillary information

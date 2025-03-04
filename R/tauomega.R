@@ -5,7 +5,7 @@
 #' @param gamma Vegetation transmissivity transfer function. VOD divided by the cosine of incidence angle
 #' @param Tair Air temperature in deg Kelvin
 #' @param Tsoil Soil temperature in deg Kelvin
-#' @param omega Impediance of canopy?
+#' @param omega Scattering albedo
 #' @param emiss Do you want to only calculate the emissitivity?
 #'
 #' @returns Vector of brightness temperatures
@@ -13,11 +13,12 @@
 #'
 tau_omega <- function(r, rhfac, gamma, Tair=NULL, Tsoil=NULL, omega, emiss = F) {
 
-if(is.null(Tair)|is.null(Tsoil)){
-  stop("Tair or Tsoil not provided.")
-}
-
 if(emiss == F){
+
+  if(is.null(Tair)|is.null(Tsoil)){
+    stop("Tair or Tsoil not provided.")
+  }
+
   # calculate rough fresnel reflectivity
   r_rough <- rhfac * r
   # calculate the soil-associated brightness temperature
