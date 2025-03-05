@@ -4,7 +4,18 @@
 \alias{retVOD}
 \title{Retrieve VOD for all values}
 \usage{
-retVOD(tbH, tbV, smc, vod, Tair, Tsoil, omega, roughness, inc_angle)
+retVOD(
+  tbH,
+  tbV,
+  smc,
+  vod,
+  Tair,
+  Tsoil,
+  omega,
+  roughness,
+  inc_angle,
+  silent = F
+)
 }
 \arguments{
 \item{tbH}{Horizontal brightness temperatures}
@@ -24,6 +35,8 @@ retVOD(tbH, tbV, smc, vod, Tair, Tsoil, omega, roughness, inc_angle)
 \item{roughness}{Soil roughness estimate}
 
 \item{inc_angle}{Incidence angle}
+
+\item{silent}{Silence progress bars in the console. Default is FALSE.}
 }
 \value{
 Retrieved VOD and auxillary information
