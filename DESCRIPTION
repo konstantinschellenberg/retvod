@@ -9,12 +9,16 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Description: Includes a collection of function and helpers for performing a test retrieval
-    Continuation lines should be indented.
+Description: Includes a collection of function and helpers for performing a test retrieval.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0)
+Imports:
+    tidyr,
+    tidyselect,
+    cli, 
+    graphics
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2

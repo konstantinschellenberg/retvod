@@ -56,4 +56,5 @@ test_that("Output matches manual single measurement solution", {
   expect_equal(retrieval$tbHpred[4], sol2$pred_tbH)
   expect_equal(retrieval$tbHcost[4], sol2$cf_tbH)
   expect_equal(retrieval$tbVcost[4], sol2$cf_tbV)
+  expect_s3_class(retrieval,"retVOD")
 })

@@ -12,6 +12,8 @@
 #'
 #' @return Retrieved VOD and auxillary information
 #' @export
+#'
+#' @import cli
 
 retVOD <- function(tbH, tbV,
                    smc,
@@ -38,6 +40,7 @@ retVOD <- function(tbH, tbV,
   )
 
   # for each brightness temperature retrieve VOD and soil moisture
+  cli::cli_progress_bar("Retrieving VOD values...", total = length(tbH))
   for (i in seq_along(tbH)) {
     est <- solveSmVod(
       smc = smc[i], tbH = tbH[i], tbV = tbV[i],
@@ -55,13 +58,71 @@ retVOD <- function(tbH, tbV,
     results$tbHpred[i] <- est$pred_tbH
     results$tbHcost[i] <- est$cf_tbH
     results$tbVcost[i] <- est$cf_tbV
+
+    cli_progress_update()  # Update progress bar
   }
+
+  results$rmse <- mean(sqrt(results$cfEst), na.rm=T)
+
+  cli_progress_done()  # Complete progress bar
+  cli_alert_success("VOD retrieval complete!")
 
   if (!identical(results$smEst, smc)) {
     warning("'Estimated' soil moisture values do not match input.")
   }
 
   return(structure(results,
-    creation_time = Sys.time()
+    creation_time = Sys.time(),
+    inputs = list(h=tbH, v=tbV, sm = smc, omega = omega, rough = roughness,angle =inc_angle),
+    class = "retVOD"
   ))
+}
+
+
+#' @export
+#' @importFrom graphics hist par abline
+#' @importFrom grDevices dev.new
+plot.retVOD <- function(x, ...){
+
+  dev.new(width = 10, height = 6)
+
+  inputs <- attr(x, "inputs")
+  par(mfrow = c(3,3), mar = c(5, 5, 1, 1))
+
+  plot(x$vodEst, main = "Retrieved Vegetation Optical Depth",
+       ylab = "VOD",
+       xlab = "Index")
+
+  plot(x$cfEst, main = "Total Tb Residuals",
+       ylab = "Brightness Temps (K^2)",
+       xlab = "Index")
+
+  hist(x$cfEst, main = "Histogram Tb Residuals", xlab= "Tb Residuals")
+
+  plot(x$tbHcost, main = "TbH Residuals (K^2)",
+       ylab = "Brightness Temps (K^2)",
+       xlab = "Index")
+
+  plot(x$tbVcost, main = "TbV Residuals (K^2)",
+       ylab = "Brightness Temps (K^2)",
+       xlab = "Index")
+
+  plot(x$tbHpred ~ x$tbHcost, main = "Predicted TbH ~ TbH Residuals",
+       ylab = "Brightness Temps (K)",
+       xlab = "Tb H Residuals (K^2)")
+  abline(a = 0, b = -1, col = "red")
+  plot(x$tbVpred ~ x$tbVcost, main = "Predicted TbV ~ TbV Residuals",
+       ylab = "Brightness Temps (K)",
+       xlab = "Tb V Residuals (K^2)")
+  abline(a = 0, b = -1, col = "red")
+
+  plot(inputs$h ~ x$tbHcost, main = "Observed TbH ~ TbH Residuals",
+       ylab = "Brightness Temps (K)",
+       xlab = "Tb H Residuals (K^2)")
+  abline(a = 0, b = 1, col = "red")
+  plot(inputs$v ~ x$tbVcost, main = "Observed TbV ~ TbV Residuals",
+       ylab = "Brightness Temps (K)",
+       xlab = "Tb V Residuals (K^2)")
+  abline(a = 0, b = 1, col = "red")
+
 }
