@@ -14,12 +14,21 @@
 #' @return List of predicted brightness temperatures, soil moisture and VOD:
 #'
 #' @export
+<<<<<<< HEAD
 #'
 solveSmVod <- function(reflecs,
+=======
+#' @importFrom purrr map2
+solveSmVod <- function(reflec,
+>>>>>>> 4bdedfdd85ab11468ebcc4f7b624fe569e1b96ff
                        gamma,
                        tbH, tbV,
                        Tair, Tsoil,
                        omega, mat=F) {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4bdedfdd85ab11468ebcc4f7b624fe569e1b96ff
   ## initialize output matrices
   num_r <- length(reflecs) # number of dielectric values
   num_gamma <- length(gamma) # number of test VOD values
@@ -35,8 +44,13 @@ solveSmVod <- function(reflecs,
     for (g in seq_along(vod)) {
       result <- estTb(
         tbH = tbH, tbV = tbV,
+<<<<<<< HEAD
         fH = reflecs[[e]][["fH"]], fV = reflecs[[e]][["fH"]],
         gamma = gamma[g],
+=======
+        fH = reflec[[e]][["fH"]], fV = reflecs[[e]][["fH"]], gamma = gamma[g],
+        rhfac = rhfac,
+>>>>>>> 4bdedfdd85ab11468ebcc4f7b624fe569e1b96ff
         Tair = Tair,
         Tsoil = Tsoil,
         omega = omega
