@@ -17,22 +17,12 @@
 #' @return List of predicted brightness temperatures, soil moisture and VOD:
 #'
 #' @export
-#'
-solveSmVod <- function(smc,
-                       vod,
+#' @importFrom purrr map2
+solveSmVod <- function(reflec,
+                       gamma,
                        tbH, tbV,
                        Tair, Tsoil,
-                       omega, inc_angle,
-                       clay_frac = 0.232, roughness, mat=F) {
-
-  ## calculate gamma and roughness factor
-  cosTheta <- cos(inc_angle * (pi / 180))
-  gamma <- exp(-1 * (vod / cosTheta))
-  rhfac <- exp(-roughness * cosTheta) # could be squared here
-
-  ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
-  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle), simplify = F)
+                       omega, mat=F) {
 
   ## initialize output matrices
   num_eps <- length(eps_list) # number of dielectric values
@@ -49,7 +39,7 @@ solveSmVod <- function(smc,
     for (g in seq_along(vod)) {
       result <- estTb(
         tbH = tbH, tbV = tbV,
-        fH = reflecs[[e]][["fH"]], fV = reflecs[[e]][["fH"]], gamma = gamma[g],
+        fH = reflec[[e]][["fH"]], fV = reflecs[[e]][["fH"]], gamma = gamma[g],
         rhfac = rhfac,
         Tair = Tair,
         Tsoil = Tsoil,
@@ -58,12 +48,6 @@ solveSmVod <- function(smc,
       # store results
       results[e,g, ] <- c(result$pred_tbH, result$pred_tbV, result$residuals$totaltb,
                           result$residuals$tbH, result$residuals$tbV)
-      # results[e, g, "pred_tbH"] <- result$pred_tbH
-      # results[e, g, "pred_tbV"] <- result$pred_tbV
-      #
-      # results[e, g, "cf_total"] <- result$residuals$totaltb
-      # results[e, g, "cf_tbH"] <- result$residuals$tbH
-      # results[e, g, "cf_tbV"] <- result$residuals$tbV
     }
   }
 

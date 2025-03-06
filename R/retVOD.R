@@ -28,6 +28,15 @@ retVOD <- function(tbH, tbV,
     stop("tbH, tbV, and smc lengths differ.")
   }
 
+  ## calculate gamma and roughness factor
+  cosTheta <- cos(inc_angle * (pi / 180))
+  gamma <- exp(-vod / cosTheta)
+  rhfac <- exp(-roughness * cosTheta) # could be squared here
+
+  ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
+  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
+  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle), simplify = F)
+
   # Prepare omega vector (if only one value, repeat for each TbH)
   o <- if (length(omega) == 1) rep_len(omega, length(tbH)) else omega
 
@@ -40,13 +49,13 @@ retVOD <- function(tbH, tbV,
   )
 
   # for each brightness temperature retrieve VOD and soil moisture
-  if (silent == F) {
+  if (!silent) {
     cli::cli_progress_bar("Retrieving VOD values...", total = length(tbH))
   }
   for (i in seq_along(tbH)) {
     est <- solveSmVod(
-      smc = smc[i], tbH = tbH[i], tbV = tbV[i],
-      vod = vod,
+      reflecs = reflecs[[i]], tbH = tbH[i], tbV = tbV[i],
+      gamma = gamma,# vod = vod,
       Tair = Tair[i], Tsoil = Tsoil[i],
       omega = o[i], roughness = roughness, inc_angle = inc_angle
     )
@@ -60,17 +69,19 @@ retVOD <- function(tbH, tbV,
     results$tbHpred[i] <- est$pred_tbH
     results$tbHcost[i] <- est$cf_tbH
     results$tbVcost[i] <- est$cf_tbV
-    if (silent == F) {
+
+    if (!silent) {
       cli_progress_update() # Update progress bar
     }
   }
 
   results$rmse <- mean(sqrt(results$cfEst), na.rm = T)
 
-  if (silent == F) {
+  if (!silent) {
     cli_progress_done() # Complete progress bar
     cli_alert_success("VOD retrieval complete!")
   }
+
   if (!identical(results$smEst, smc)) {
     warning("'Estimated' soil moisture values do not match input.")
   }
