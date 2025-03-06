@@ -4,12 +4,14 @@
 \alias{fresnelr}
 \title{Fresnel's reflectivity calculation}
 \usage{
-fresnelr(eps, theta)
+fresnelr(eps, theta, h)
 }
 \arguments{
 \item{eps}{Dielectric}
 
 \item{theta}{Incidence angle in degrees}
+
+\item{h}{Soil surface roughness}
 }
 \value{
 List of horizontal and vertical polarization reflectivity

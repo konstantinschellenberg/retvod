@@ -11,9 +11,9 @@ estTb(tbH, tbV, fH, fV, gamma, Tair, Tsoil, omega, rhfac)
 
 \item{tbV}{Observed vertically polarized brightness temperature}
 
-\item{fH}{Estimated horizontal fresnel reflectivity}
+\item{fH}{Estimated horizontal fresnel reflectivity rough}
 
-\item{fV}{Estimated vertical fresnel reflectivity}
+\item{fV}{Estimated vertical fresnel reflectivity rough}
 
 \item{gamma}{Transfer function}
 
@@ -22,11 +22,9 @@ estTb(tbH, tbV, fH, fV, gamma, Tair, Tsoil, omega, rhfac)
 \item{Tsoil}{Soil temperature}
 
 \item{omega}{Canopy opacity}
-
-\item{rhfac}{Roughness factor}
 }
 \value{
-Vertical and horizontally polarized brightness temperatures
+Vertical and horizontally polarized brightness temperatures and residuals
 }
 \description{
 Predict brightness temperatures

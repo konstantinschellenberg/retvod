@@ -1,15 +1,12 @@
 #' Solve for soil moisture and VOD
 #'
-#' @param smc Soil moisture
-#' @param vod Test VOD values
+#' @param reflecs H and V pol reflectivities
+#' @param gamma Gamma estimates for each test VOD value
 #' @param tbH Horizontal brightness temperature
 #' @param tbV Vertical brightness temperature
 #' @param Tair Air temperature
 #' @param Tsoil Soil temperature
 #' @param omega Scattering albedo
-#' @param inc_angle Incidence angle
-#' @param clay_frac Clay fraction
-#' @param roughness Roughness estimate
 #' @param mat TRUE returns the cost function matrix
 #'
 #' @description This function uses the a range of input soil moisture and vod values to solve for the best VOD value given the air, soil, and observed brightness temperatures.
@@ -18,25 +15,14 @@
 #'
 #' @export
 #'
-solveSmVod <- function(smc,
-                       vod,
+solveSmVod <- function(reflecs,
+                       gamma,
                        tbH, tbV,
                        Tair, Tsoil,
-                       omega, inc_angle,
-                       clay_frac = 0.232, roughness, mat=F) {
-
-  ## calculate gamma and roughness factor
-  cosTheta <- cos(inc_angle * (pi / 180))
-  gamma <- exp(-1 * (vod / cosTheta))
-  rhfac <- exp(-roughness * cosTheta) # could be squared here
-
-  ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
-  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle), simplify = F)
-
+                       omega, mat=F) {
   ## initialize output matrices
-  num_eps <- length(eps_list) # number of dielectric values
-  num_vod <- length(vod) # number of test VOD values
+  num_r <- length(reflecs) # number of dielectric values
+  num_gamma <- length(gamma) # number of test VOD values
 
   # array to hold residuals and predictions for each epsilon and gamma
   results <- array(NA,
@@ -49,8 +35,8 @@ solveSmVod <- function(smc,
     for (g in seq_along(vod)) {
       result <- estTb(
         tbH = tbH, tbV = tbV,
-        fH = reflecs[[e]][["fH"]], fV = reflecs[[e]][["fH"]], gamma = gamma[g],
-        rhfac = rhfac,
+        fH = reflecs[[e]][["fH"]], fV = reflecs[[e]][["fH"]],
+        gamma = gamma[g],
         Tair = Tair,
         Tsoil = Tsoil,
         omega = omega
@@ -58,12 +44,6 @@ solveSmVod <- function(smc,
       # store results
       results[e,g, ] <- c(result$pred_tbH, result$pred_tbV, result$residuals$totaltb,
                           result$residuals$tbH, result$residuals$tbV)
-      # results[e, g, "pred_tbH"] <- result$pred_tbH
-      # results[e, g, "pred_tbV"] <- result$pred_tbV
-      #
-      # results[e, g, "cf_total"] <- result$residuals$totaltb
-      # results[e, g, "cf_tbH"] <- result$residuals$tbH
-      # results[e, g, "cf_tbV"] <- result$residuals$tbV
     }
   }
 

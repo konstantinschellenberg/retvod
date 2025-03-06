@@ -1,17 +1,19 @@
 #' Tau-omega model
 #'
-#' @param r Fresnel reflectivity
-#' @param rhfac Roughness factor to apply to `r`
+#' @param r_rough Rough surface reflectivity (i.e., smooth reflectivity * rhfac)
 #' @param gamma Vegetation transmissivity transfer function. VOD divided by the cosine of incidence angle
 #' @param Tair Air temperature in deg Kelvin
 #' @param Tsoil Soil temperature in deg Kelvin
 #' @param omega Scattering albedo
 #' @param emiss Do you want to only calculate the emissitivity?
 #'
+#'
+#' @details The reflectivities should be accounting to the roughness of the surface before input into this function. See `fresnelr.R`for more details
+#'          for the way that the roughness factor was calculated and applied.
 #' @returns Vector of brightness temperatures
 #' @export
 #'
-tau_omega <- function(r, rhfac, gamma, Tair=NULL, Tsoil=NULL, omega, emiss = F) {
+tau_omega <- function(r_rough, gamma, Tair=NULL, Tsoil=NULL, omega, emiss = F) {
 
 if(emiss == F){
 
@@ -19,8 +21,6 @@ if(emiss == F){
     stop("Tair or Tsoil not provided.")
   }
 
-  # calculate rough fresnel reflectivity
-  r_rough <- rhfac * r
   # calculate the soil-associated brightness temperature
   tbs <- (1 - r_rough) * gamma * Tsoil
   # calculate the canopy-associated brightness temperature
@@ -33,8 +33,7 @@ if(emiss == F){
     list(tbs, tbc, totaltb),
     names = c("tbs", "tbc", "totaltb"),
     inputs = list(
-      r = r,
-      rhfac = rhfac,
+      r_rough = r_rough,
       gamma = gamma,
       Tsoil = Tsoil,
       Tair = Tair,
@@ -47,18 +46,14 @@ if(emiss == F){
 
 }else{
 
-    r_rough <- rhfac * r
     emissivity <- (1 - r_rough) * gamma + (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma))
     # return the soil and canopy brightness temperatures and the total brightness temperature
     to_out<-structure(
       list(emissivity),
       .Names = "emissivity",
       inputs = list(
-        r = r,
-        rhfac = rhfac,
+        r_rough = r_rough,
         gamma = gamma,
-        Tsoil = Tsoil,
-        Tair = Tair,
         omega = omega
       )
     )

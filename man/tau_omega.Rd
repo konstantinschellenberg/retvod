@@ -4,12 +4,10 @@
 \alias{tau_omega}
 \title{Tau-omega model}
 \usage{
-tau_omega(r, rhfac, gamma, Tair = NULL, Tsoil = NULL, omega, emiss = F)
+tau_omega(r_rough, gamma, Tair = NULL, Tsoil = NULL, omega, emiss = F)
 }
 \arguments{
-\item{r}{Fresnel reflectivity}
-
-\item{rhfac}{Roughness factor to apply to `r`}
+\item{r_rough}{Rough surface reflectivity (i.e., smooth reflectivity * rhfac)}
 
 \item{gamma}{Vegetation transmissivity transfer function. VOD divided by the cosine of incidence angle}
 
@@ -26,4 +24,8 @@ Vector of brightness temperatures
 }
 \description{
 Tau-omega model
+}
+\details{
+The reflectivities should be accounting to the roughness of the surface before input into this function. See `fresnelr.R`for more details
+         for the way that the roughness factor was calculated and applied.
 }

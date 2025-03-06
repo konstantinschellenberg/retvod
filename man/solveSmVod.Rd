@@ -4,24 +4,12 @@
 \alias{solveSmVod}
 \title{Solve for soil moisture and VOD}
 \usage{
-solveSmVod(
-  smc,
-  vod,
-  tbH,
-  tbV,
-  Tair,
-  Tsoil,
-  omega,
-  inc_angle,
-  clay_frac = 0.232,
-  roughness,
-  mat = F
-)
+solveSmVod(reflecs, gamma, tbH, tbV, Tair, Tsoil, omega, mat = F)
 }
 \arguments{
-\item{smc}{Soil moisture}
+\item{reflecs}{H and V pol reflectivities}
 
-\item{vod}{Test VOD values}
+\item{gamma}{Gamma estimates for each test VOD value}
 
 \item{tbH}{Horizontal brightness temperature}
 
@@ -32,12 +20,6 @@ solveSmVod(
 \item{Tsoil}{Soil temperature}
 
 \item{omega}{Scattering albedo}
-
-\item{inc_angle}{Incidence angle}
-
-\item{clay_frac}{Clay fraction}
-
-\item{roughness}{Roughness estimate}
 
 \item{mat}{TRUE returns the cost function matrix}
 }
