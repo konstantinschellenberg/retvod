@@ -33,7 +33,7 @@ retVOD <- function(tbH, tbV,
 
   ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
   eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h=roughness), simplify = T)|>t()
+  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h=roughness), simplify = F)
 
   ## prepare omega vector (if only one value, repeat for each tbH)
   o <- if (length(omega) == 1) rep_len(omega, length(tbH)) else omega
@@ -53,16 +53,18 @@ retVOD <- function(tbH, tbV,
 
   for (i in seq_along(tbH)) {
     est <- solveSmVod(
-      reflecs = reflecs[[i]], tbH = tbH[i], tbV = tbV[i],
+      reflec = reflecs[i], tbH = tbH[i], tbV = tbV[i],
       gamma = gamma,# vod = vod,
       Tair = Tair[i], Tsoil = Tsoil[i],
-      omega = o[i], roughness = roughness, inc_angle = inc_angle
+      omega = o[i], mat = T
     )
 
+    smidx<-which(sapply(reflecs, function(x) x$fH == est$reflec_best$fH && x$fV == est$reflec_best$fV))
+
     # return elements from retrieval
-    results$vodEst[i] <- est$vod_est
+    results$vodEst[i] <- vod[which(gamma==est$gamma_best)]
     results$cfEst[i] <- est$cf_tb
-    results$smEst[i] <- est$sm_est
+    results$smEst[i] <- smc[smidx]
     results$tbVpred[i] <- est$pred_tbV
     results$tbHpred[i] <- est$pred_tbH
     results$tbHcost[i] <- est$cf_tbH
@@ -73,7 +75,7 @@ retVOD <- function(tbH, tbV,
     }
   }
 
-  results$rmse <- mean(sqrt(results$cfEst), na.rm = T)
+  results$rmse_k <- mean(sqrt(results$cfEst), na.rm = T)
 
   if (!silent) {
     cli_progress_done() # Complete progress bar

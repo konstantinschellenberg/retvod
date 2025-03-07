@@ -5,18 +5,18 @@ test_that("Correct VOD values chosen", {
   air <- 300
   soil <- 275
   omega <- 0.03
-  angle <- 40 # degrees
-  clay <- 0.232
+  inc_angle <- 40 # degrees
+  clay_frac <- 0.232
   h <- 0.16
   tbH <- 280
   tbV <- 285
 
   ## calculate gamma for each VOD test value
-  gamma <- exp(-vod / cos(inc_angle* (pi/180)))
+  gamma <- exp(-vod_test / cos(inc_angle * (pi / 180)))
 
   ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
   eps_list <- sapply(sm, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h=roughness), simplify = T)|>t()
+  reflecs <- lapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h))
 
   # run function
   sol1 <- solveSmVod(
@@ -28,12 +28,12 @@ test_that("Correct VOD values chosen", {
   )
 
   # check that the correct values are chosen
-  expect_equal(reflecs[sol1$min_cf_index[[1]],], sol1$reflec_best)
+  expect_equal(reflecs[[sol1$min_cf_index[1]]], sol1$reflec_best)
   expect_true(sol1$gamma_best %in% gamma)
   expect_equal(min(sol1$cf_mat), sol1$cf_tb)
 
-  #check specific indices
-  expect_equal(reflecs[2,], sol1$reflec_best)
+  # check specific indices
+  expect_equal(reflecs[2, ], sol1$reflec_best)
   expect_equal(gamma[2], sol1$gamma_best)
 
   # check that the H and V cf sum is the same as what is reported for the total cf
@@ -65,16 +65,16 @@ test_that("Same values backward and forward", {
   sm <- retvod:::gen_sin(1000, rangeL = 0.2, rangeH = 0.35) |> sample(size = 7)
   vod <- sm * 2
   inc_angle <- 40
-
+  clay_frac <- 0.3
   ## calculate gamma for each VOD test value
-  gamma <- exp(-vod / cos(inc_angle* (pi/180)))
+  gamma <- exp(-vod / cos(inc_angle * (pi / 180)))
 
   ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
   eps_list <- sapply(sm, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h=0.1), simplify = F)
+  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h = 0.1), simplify = F)
 
   sol2forward <- solveSmVod(
-    reflec=reflecs[4], gamma = gamma, tbH = h[4], tbV = v[4],
+    reflec = reflecs[4], gamma = gamma, tbH = h[4], tbV = v[4],
     Tair = air[4], Tsoil = soil[4],
     omega = 0.5,
     mat = T
@@ -88,10 +88,10 @@ test_that("Same values backward and forward", {
   input_reflec <- reflecs[[4]]
 
   sol2_back <- solveSmVod(
-    reflec=reflecs, gamma = solved_gamma, tbH = h[4], tbV = v[4],
+    reflec = reflecs, gamma = solved_gamma, tbH = h[4], tbV = v[4],
     Tair = air[4], Tsoil = soil[4],
     omega = 0.5,
     mat = T
   )
-  expect_identical(sol2forward[-c(1,9)], sol2_back[-c(1,9)])
+  expect_identical(sol2forward[-c(1, 9)], sol2_back[-c(1, 9)])
 })

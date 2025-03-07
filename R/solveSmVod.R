@@ -55,10 +55,7 @@ solveSmVod <- function(reflec,
   }
 
   min_index <- which(results[, , "cf_total"] == min(results[, , "cf_total"],
-                                                    na.rm = TRUE),
-
-    arr.ind = TRUE
-  )
+                                                    na.rm = TRUE), arr.ind = TRUE)
 
   if(num_r==1){
     best_row <- 1
@@ -72,7 +69,7 @@ solveSmVod <- function(reflec,
   }
 
   output <- list(
-    min_cf_index = min_index,
+    min_cf_index = c(best_row, best_col)|>unname(),
     cf_tb = results[best_row, best_col, "cf_total"]|>unname(),
     #epsilon = eps_list[best_row],
     pred_tbH = results[best_row, best_col, "pred_tbH"]|>unname(),
