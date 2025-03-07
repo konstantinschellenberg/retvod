@@ -17,8 +17,7 @@ estTb <- function(
     fH, fV,
     gamma,
     Tair, Tsoil,
-    omega,
-    rhfac) {
+    omega) {
 
   # Estimate brightness temperature for H and V polarizations
   pred_tbH <- tau_omega(r = fH, gamma = gamma, Tair = Tair, Tsoil = Tsoil, omega = omega)$totaltb

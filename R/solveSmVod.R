@@ -14,43 +14,36 @@
 #' @return List of predicted brightness temperatures, soil moisture and VOD:
 #'
 #' @export
-<<<<<<< HEAD
-#'
-solveSmVod <- function(reflecs,
-=======
 #' @importFrom purrr map2
+#'
 solveSmVod <- function(reflec,
->>>>>>> 4bdedfdd85ab11468ebcc4f7b624fe569e1b96ff
                        gamma,
                        tbH, tbV,
                        Tair, Tsoil,
                        omega, mat=F) {
-<<<<<<< HEAD
-=======
 
->>>>>>> 4bdedfdd85ab11468ebcc4f7b624fe569e1b96ff
   ## initialize output matrices
-  num_r <- length(reflecs) # number of dielectric values
+  num_r <- length(reflec) # number of dielectric values
   num_gamma <- length(gamma) # number of test VOD values
 
   # array to hold residuals and predictions for each epsilon and gamma
   results <- array(NA,
-    dim = c(num_eps, num_vod, 5), # rows, columns, calc values
-    dimnames = list(smc, vod, c("pred_tbH", "pred_tbV", "cf_total", "cf_tbH", "cf_tbV"))
+    dim = c(num_r, num_gamma, 5), # rows, columns, calc values
+    dimnames = list(seq(1,num_r), seq(1,num_gamma), c("pred_tbH", "pred_tbV", "cf_total", "cf_tbH", "cf_tbV"))
   )
 
   ## Compute cost function for all combinations of epsilon and VOD
-  for (e in seq_along(smc)) {
-    for (g in seq_along(vod)) {
+  ## Q: What combo of smc and vod would the reflecs represent?
+  ## For each eps(dielectric) and potential g(gamma,vod), calculate brightness temperatures
+  ## and report the cost function (diff between calculated and obs Tbs)
+  ## Doing a single variable retrieval right so one smc
+  #
+  for (e in seq_len(num_r)) {
+    for (g in seq_len(num_gamma)) {
       result <- estTb(
         tbH = tbH, tbV = tbV,
-<<<<<<< HEAD
-        fH = reflecs[[e]][["fH"]], fV = reflecs[[e]][["fH"]],
+        fH = reflec[[e]]$fH, fV = reflec[[e]]$fV,
         gamma = gamma[g],
-=======
-        fH = reflec[[e]][["fH"]], fV = reflecs[[e]][["fH"]], gamma = gamma[g],
-        rhfac = rhfac,
->>>>>>> 4bdedfdd85ab11468ebcc4f7b624fe569e1b96ff
         Tair = Tair,
         Tsoil = Tsoil,
         omega = omega
@@ -67,10 +60,10 @@ solveSmVod <- function(reflec,
     arr.ind = TRUE
   )
 
-  if(length(smc)==1){
+  if(num_r==1){
     best_row <- 1
     best_col <- min_index
-  }else if (length(vod)==1){
+  }else if (num_gamma==1){
     best_row <- min_index
     best_col <- 1
   }else{
@@ -81,13 +74,13 @@ solveSmVod <- function(reflec,
   output <- list(
     min_cf_index = min_index,
     cf_tb = results[best_row, best_col, "cf_total"]|>unname(),
-    epsilon = eps_list[best_row],
+    #epsilon = eps_list[best_row],
     pred_tbH = results[best_row, best_col, "pred_tbH"]|>unname(),
     pred_tbV = results[best_row, best_col, "pred_tbV"]|>unname(),
     cf_tbH = results[best_row, best_col, "cf_tbH"]|>unname(),
     cf_tbV = results[best_row, best_col, "cf_tbV"]|>unname(),
-    sm_est = smc[best_row],
-    vod_est = vod[best_col],
+    reflec_best = reflec[[best_row]],
+    gamma_best = gamma[best_col],
     cf_mat = if (mat == T) results[, , "cf_total"] else NA
   )
   return(structure(output,

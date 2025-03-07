@@ -28,19 +28,17 @@ retVOD <- function(tbH, tbV,
     stop("tbH, tbV, and smc lengths differ.")
   }
 
-  ## calculate gamma and roughness factor
-  cosTheta <- cos(inc_angle * (pi / 180))
-  gamma <- exp(-vod / cosTheta)
-  rhfac <- exp(-roughness * cosTheta) # could be squared here
+  ## calculate gamma for each VOD test value
+  gamma <- exp(-vod / cos(inc_angle* (pi/180)))
 
   ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
   eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
-  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle), simplify = F)
+  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h=roughness), simplify = T)|>t()
 
-  # Prepare omega vector (if only one value, repeat for each TbH)
+  ## prepare omega vector (if only one value, repeat for each tbH)
   o <- if (length(omega) == 1) rep_len(omega, length(tbH)) else omega
 
-  # initialize lists for the results
+  ## initialize lists for the results
   results <- vector("list", length(tbH))
   names(results) <- c(
     "vodEst", "cfEst", "smEst",
@@ -52,6 +50,7 @@ retVOD <- function(tbH, tbV,
   if (!silent) {
     cli::cli_progress_bar("Retrieving VOD values...", total = length(tbH))
   }
+
   for (i in seq_along(tbH)) {
     est <- solveSmVod(
       reflecs = reflecs[[i]], tbH = tbH[i], tbV = tbV[i],
@@ -61,7 +60,6 @@ retVOD <- function(tbH, tbV,
     )
 
     # return elements from retrieval
-
     results$vodEst[i] <- est$vod_est
     results$cfEst[i] <- est$cf_tb
     results$smEst[i] <- est$sm_est

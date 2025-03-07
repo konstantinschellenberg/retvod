@@ -13,42 +13,39 @@
 #' @returns Vector of brightness temperatures
 #' @export
 #'
-tau_omega <- function(r_rough, gamma, Tair=NULL, Tsoil=NULL, omega, emiss = F) {
+tau_omega <- function(r_rough, gamma, Tair = NULL, Tsoil = NULL, omega, emiss = F) {
+  if (emiss == F) {
+    if (is.null(Tair) | is.null(Tsoil)) {
+      stop("Tair or Tsoil not provided.")
+    }
 
-if(emiss == F){
+    # calculate the soil-associated brightness temperature
+    tbs <- (1 - r_rough) * gamma * Tsoil
+    # calculate the canopy-associated brightness temperature
+    tbc <- (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma)) * Tair
+    # calculate the total brightness temperature
+    totaltb <- tbs + tbc
 
-  if(is.null(Tair)|is.null(Tsoil)){
-    stop("Tair or Tsoil not provided.")
-  }
+    # return the soil and canopy brightness temperatures and the total brightness temperature
+    to_out <- structure(
+      list(tbs, tbc, totaltb),
+      names = c("tbs", "tbc", "totaltb"),
+      inputs = list(
+        r_rough = r_rough,
+        gamma = gamma,
+        Tsoil = Tsoil,
+        Tair = Tair,
+        omega = omega
+      ),
+      class = "tb"
+    )
 
-  # calculate the soil-associated brightness temperature
-  tbs <- (1 - r_rough) * gamma * Tsoil
-  # calculate the canopy-associated brightness temperature
-  tbc <- (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma)) * Tair
-  # calculate the total brightness temperature
-  totaltb <- tbs + tbc
+    return(to_out)
 
-  # return the soil and canopy brightness temperatures and the total brightness temperature
-  to_out <- structure(
-    list(tbs, tbc, totaltb),
-    names = c("tbs", "tbc", "totaltb"),
-    inputs = list(
-      r_rough = r_rough,
-      gamma = gamma,
-      Tsoil = Tsoil,
-      Tair = Tair,
-      omega = omega
-    ),
-    class = "tb"
-  )
-
-  return(to_out)
-
-}else{
-
+  } else {
     emissivity <- (1 - r_rough) * gamma + (1 - omega) * (1 - gamma) * (1 + (r_rough * gamma))
     # return the soil and canopy brightness temperatures and the total brightness temperature
-    to_out<-structure(
+    to_out <- structure(
       list(emissivity),
       .Names = "emissivity",
       inputs = list(
@@ -59,16 +56,13 @@ if(emiss == F){
     )
     return(to_out)
   }
-
 }
 
 #' @export
-print.tb <- function(x, ...){
-
+print.tb <- function(x, ...) {
   cat("Soil Brightness Temperature:", x$tbs, "\n")
   cat("Canopy Brightness Temperature:", x$tbc, "\n")
   cat("Total:", x$totaltb, "\n")
 
   cat("\n To see the inputs, check attr(obj,'inputs')")
-
 }

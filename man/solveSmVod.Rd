@@ -4,11 +4,9 @@
 \alias{solveSmVod}
 \title{Solve for soil moisture and VOD}
 \usage{
-solveSmVod(reflecs, gamma, tbH, tbV, Tair, Tsoil, omega, mat = F)
+solveSmVod(reflec, gamma, tbH, tbV, Tair, Tsoil, omega, mat = F)
 }
 \arguments{
-\item{reflecs}{H and V pol reflectivities}
-
 \item{gamma}{Gamma estimates for each test VOD value}
 
 \item{tbH}{Horizontal brightness temperature}
@@ -22,6 +20,8 @@ solveSmVod(reflecs, gamma, tbH, tbV, Tair, Tsoil, omega, mat = F)
 \item{omega}{Scattering albedo}
 
 \item{mat}{TRUE returns the cost function matrix}
+
+\item{reflecs}{H and V pol reflectivities}
 }
 \value{
 List of predicted brightness temperatures, soil moisture and VOD:

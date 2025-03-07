@@ -4,7 +4,7 @@
 \alias{estTb}
 \title{Predict brightness temperatures}
 \usage{
-estTb(tbH, tbV, fH, fV, gamma, Tair, Tsoil, omega, rhfac)
+estTb(tbH, tbV, fH, fV, gamma, Tair, Tsoil, omega)
 }
 \arguments{
 \item{tbH}{Observed horizontally polarized brightness temperature}
