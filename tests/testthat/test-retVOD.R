@@ -33,24 +33,29 @@ test_that("Output matches manual single measurement solution", {
 
   set.seed(2)
   sm <- retvod:::gen_sin(1000, rangeL = 0.2, rangeH = 0.45) |> sample(size = 7)
-  vod <- seq(0,3, length.out = 30)
+  vod <- seq(0,3, length.out = 7)
   inc_angle <- 40
+  ## calculate gamma for each VOD test value
+  gamma <- exp(-vod / cos(inc_angle * (pi / 180)))
+  clay_frac=0.232
+  ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
+  eps_list <- sapply(sm, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
+  reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h = 0.1), simplify = F)
 
   sol2 <- solveSmVod(
-    smc = sm[4], vod = vod, tbH = h[4], tbV = v[4],
+    reflecs[4], gamma = gamma, tbH = h[4], tbV = v[4],
     Tair = air[4], Tsoil = soil[4],
-    omega = 0.5, clay_frac = 0.232,
-    roughness = 0.1, inc_angle = 40,
+    omega = 0.05, #clay_frac = 0.232,
     mat = T
   )
 
   retrieval <- retVOD(h,v,
                       smc = sm, vod = vod,
-                      Tair = air, Tsoil = soil,
-                      omega= 0.5, roughness = 0.1, inc_angle = 40)
+                      Tair = air, Tsoil = soil, cf = 0.232,
+                      omega= 0.05, roughness = 0.1, inc_angle = 40)
 
   expect_identical(sm, retrieval$smEst) # soil moisture input and output are same
-  expect_equal(retrieval$vodEst[4],sol2$vod_est) # output from solution is same as retrieved values
+  expect_equal(retrieval$reflectivity[[4]],sol2$reflec_best) # output from solution is same as retrieved values
   expect_equal(retrieval$cfEst[4],sol2$cf_tb)
   expect_equal(retrieval$tbVpred[4], sol2$pred_tbV)
   expect_equal(retrieval$tbHpred[4], sol2$pred_tbH)

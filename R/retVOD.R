@@ -9,6 +9,7 @@
 #' @param omega Canopy opacity, scattering albedo
 #' @param roughness Soil roughness estimate
 #' @param inc_angle Incidence angle
+#' @param cf Clay fraction
 #' @param silent Silence progress bars in the console. Default is FALSE.
 #'
 #' @return Retrieved VOD and auxillary information
@@ -23,6 +24,7 @@ retVOD <- function(tbH, tbV,
                    Tsoil,
                    omega,
                    roughness,
+                   cf,
                    inc_angle, silent = F) {
   if (length(tbH) != length(tbV) || length(tbH) != length(smc)) {
     stop("tbH, tbV, and smc lengths differ.")
@@ -32,7 +34,7 @@ retVOD <- function(tbH, tbV,
   gamma <- exp(-vod / cos(inc_angle* (pi/180)))
 
   ## calculate epsilon (dielectric) and reflectivitys for each value of soil moisture
-  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, clay_frac)$dielectric)
+  eps_list <- sapply(smc, \(s) mironov(1.4e9, s, cf)$dielectric)
   reflecs <- sapply(eps_list, \(e) fresnelr(eps = e, theta = inc_angle, h=roughness), simplify = F)
 
   ## prepare omega vector (if only one value, repeat for each tbH)
@@ -76,6 +78,8 @@ retVOD <- function(tbH, tbV,
   }
 
   results$rmse_k <- mean(sqrt(results$cfEst), na.rm = T)
+  results$reflectivity <- reflecs
+  results$gamma <- gamma
 
   if (!silent) {
     cli_progress_done() # Complete progress bar
@@ -88,7 +92,7 @@ retVOD <- function(tbH, tbV,
 
   return(structure(results,
     creation_time = Sys.time(),
-    inputs = list(h = tbH, v = tbV, sm = smc, omega = omega, rough = roughness, angle = inc_angle),
+    inputs = list(h = tbH, v = tbV, sm = smc, Tair = Tair, Tsoil=Tsoil, omega = omega, rough = roughness, angle = inc_angle),
     class = "retVOD"
   ))
 }

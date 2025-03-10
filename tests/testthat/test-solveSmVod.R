@@ -33,8 +33,8 @@ test_that("Correct VOD values chosen", {
   expect_equal(min(sol1$cf_mat), sol1$cf_tb)
 
   # check specific indices
-  expect_equal(reflecs[2, ], sol1$reflec_best)
-  expect_equal(gamma[2], sol1$gamma_best)
+  expect_equal(reflecs[[1]], sol1$reflec_best)
+  expect_equal(gamma[3], sol1$gamma_best)
 
   # check that the H and V cf sum is the same as what is reported for the total cf
   sum_cfHV <- sol1$cf_tbV + sol1$cf_tbH

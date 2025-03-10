@@ -13,6 +13,7 @@ retVOD(
   Tsoil,
   omega,
   roughness,
+  cf,
   inc_angle,
   silent = F
 )
@@ -33,6 +34,8 @@ retVOD(
 \item{omega}{Canopy opacity, scattering albedo}
 
 \item{roughness}{Soil roughness estimate}
+
+\item{cf}{Clay fraction}
 
 \item{inc_angle}{Incidence angle}
 

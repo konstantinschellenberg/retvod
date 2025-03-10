@@ -14,7 +14,6 @@
 #' @return List of predicted brightness temperatures, soil moisture and VOD:
 #'
 #' @export
-#' @importFrom purrr map2
 #'
 solveSmVod <- function(reflec,
                        gamma,
