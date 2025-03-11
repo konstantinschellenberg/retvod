@@ -7,6 +7,8 @@
 solveSmVod(reflec, gamma, tbH, tbV, Tair, Tsoil, omega, mat = F)
 }
 \arguments{
+\item{reflec}{H and V pol reflectivities}
+
 \item{gamma}{Gamma estimates for each test VOD value}
 
 \item{tbH}{Horizontal brightness temperature}
@@ -20,8 +22,6 @@ solveSmVod(reflec, gamma, tbH, tbV, Tair, Tsoil, omega, mat = F)
 \item{omega}{Scattering albedo}
 
 \item{mat}{TRUE returns the cost function matrix}
-
-\item{reflecs}{H and V pol reflectivities}
 }
 \value{
 List of predicted brightness temperatures, soil moisture and VOD:

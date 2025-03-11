@@ -47,6 +47,12 @@ retVOD <- function(tbH, tbV,
     "tbHpred", "tbVpred",
     "tbHcost", "tbVcost"
   )
+  n <- length(tbH)
+  results <- list(
+    vodEst = numeric(n), cfEst = numeric(n), smEst = numeric(n),
+    tbHpred = numeric(n), tbVpred = numeric(n),
+    tbHcost = numeric(n), tbVcost = numeric(n)
+  )
 
   # for each brightness temperature retrieve VOD and soil moisture
   if (!silent) {
@@ -61,12 +67,13 @@ retVOD <- function(tbH, tbV,
       omega = o[i], mat = T
     )
 
-    smidx<-which(sapply(reflecs, function(x) x$fH == est$reflec_best$fH && x$fV == est$reflec_best$fV))
+    smidx<-which(sapply(reflecs[i], function(x) x$fH == est$reflec_best$fH && x$fV == est$reflec_best$fV))
+
 
     # return elements from retrieval
     results$vodEst[i] <- vod[which(gamma==est$gamma_best)]
     results$cfEst[i] <- est$cf_tb
-    results$smEst[i] <- smc[smidx]
+    results$smEst[i] <- smc[i]#[smidx]
     results$tbVpred[i] <- est$pred_tbV
     results$tbHpred[i] <- est$pred_tbH
     results$tbHcost[i] <- est$cf_tbH
@@ -93,7 +100,7 @@ retVOD <- function(tbH, tbV,
   return(structure(results,
     creation_time = Sys.time(),
     inputs = list(h = tbH, v = tbV, sm = smc, Tair = Tair, Tsoil=Tsoil, omega = omega, rough = roughness, angle = inc_angle),
-    class = "retVOD"
+    class = c("retVOD", "data.frame")
   ))
 }
 

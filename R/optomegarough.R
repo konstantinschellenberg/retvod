@@ -28,13 +28,13 @@ optOR <- function(df, range_omega, range_roughness, precision) {
         Tair = df[["phys_temp"]],
         Tsoil = df[["mean_soil_temp"]],
         omega = range_omega[o],
-        roughness = range_roughness[r],
+        roughness = range_roughness[r],cf = 0.232,
         inc_angle = 40, silent = T
       )
 
       name <- paste("omega", round(range_omega[o], 5), "rough", range_roughness[r], sep = "_")
       print(name)
-      optOut[[index]] <- sum(retrieval$costfx, na.rm = T)
+      optOut[[index]] <- sum(retrieval$cfEst, na.rm = T)
       names(optOut)[index] <- name
       index <- index + 1
 

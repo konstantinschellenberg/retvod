@@ -1,6 +1,6 @@
 #' Solve for soil moisture and VOD
 #'
-#' @param reflecs H and V pol reflectivities
+#' @param reflec H and V pol reflectivities
 #' @param gamma Gamma estimates for each test VOD value
 #' @param tbH Horizontal brightness temperature
 #' @param tbV Vertical brightness temperature

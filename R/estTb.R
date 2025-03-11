@@ -20,8 +20,8 @@ estTb <- function(
     omega) {
 
   # Estimate brightness temperature for H and V polarizations
-  pred_tbH <- tau_omega(r = fH, gamma = gamma, Tair = Tair, Tsoil = Tsoil, omega = omega)$totaltb
-  pred_tbV <- tau_omega(r = fV, gamma = gamma, Tair = Tair, Tsoil = Tsoil, omega = omega)$totaltb
+  pred_tbH <- tau_omega(r_rough = fH, gamma = gamma, Tair = Tair, Tsoil = Tsoil, omega = omega)$totaltb
+  pred_tbV <- tau_omega(r_rough = fV, gamma = gamma, Tair = Tair, Tsoil = Tsoil, omega = omega)$totaltb
 
   # Compute the squared difference between predicted and observed brightness temperatures
   res <- tbResiduals(tbH = tbH, tbV = tbV, tbHpred = pred_tbH, tbVpred = pred_tbV)
