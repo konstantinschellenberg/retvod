@@ -100,7 +100,7 @@ retVOD <- function(tbH, tbV,
   return(structure(results,
     creation_time = Sys.time(),
     inputs = list(h = tbH, v = tbV, sm = smc, Tair = Tair, Tsoil=Tsoil, omega = omega, rough = roughness, angle = inc_angle),
-    class = c("retVOD", "data.frame")
+    class = c( "retVOD","data.frame")
   ))
 }
 
@@ -109,10 +109,10 @@ retVOD <- function(tbH, tbV,
 #' @importFrom graphics hist par abline
 #' @importFrom grDevices dev.new
 plot.retVOD <- function(x, ...) {
-  dev.new(width = 10, height = 6)
+  dev.new(width = 12, height = 8)
 
   inputs <- attr(x, "inputs")
-  par(mfrow = c(3, 3), mar = c(5, 5, 1, 1))
+  par(mfrow = c(3, 4), mar = c(5, 5, 1, 1))
 
   plot(x$vodEst,
     main = "Retrieved Vegetation Optical Depth",
@@ -146,6 +146,7 @@ plot.retVOD <- function(x, ...) {
     xlab = "Tb H Residuals (K^2)"
   )
   abline(a = 0, b = -1, col = "red")
+
   plot(x$tbVpred ~ x$tbVcost,
     main = "Predicted TbV ~ TbV Residuals",
     ylab = "Brightness Temps (K)",
@@ -165,4 +166,20 @@ plot.retVOD <- function(x, ...) {
     xlab = "Tb V Residuals (K^2)"
   )
   abline(a = 0, b = 1, col = "red")
+
+  plot(x$cfEst ~ inputs$sm,
+       main = "Total Res. ~ Soil Moisture",
+       ylab = "Total Tb Residuals",
+       xlab = "Soil Moisture")
+
+  plot(x$cfEst ~ inputs$Tair,
+       main = "Total Res. ~ Air Temp",
+       ylab = "Total Tb Residuals",
+       xlab = "Air Temperature")
+
+  plot(x$cfEst ~ inputs$Tsoil,
+       main = "Total Res. ~ Soil Temp",
+       ylab = "Total Tb Residuals",
+       xlab = "Soil Temperature")
+
 }

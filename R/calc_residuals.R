@@ -33,7 +33,8 @@ tbResiduals <- function(tbH, tbV, tbHpred, tbVpred) {
       totaltb_res,
       rse
     ),
-    .Names = c("tbH", "tbV", "totaltb", "rootSE")
+    .Names = c("tbH", "tbV", "totaltb", "rootSE"),
+    class = c("list", "res")
   )
   return(res)
 }

@@ -33,7 +33,7 @@ test_that("Output matches manual single measurement solution", {
 
   set.seed(2)
   sm <- retvod:::gen_sin(1000, rangeL = 0.2, rangeH = 0.45) |> sample(size = 7)
-  vod <- seq(0,3, length.out = 7)
+  vod <- seq(0,2, length.out = 7)
   inc_angle <- 40
   ## calculate gamma for each VOD test value
   gamma <- exp(-vod / cos(inc_angle * (pi / 180)))
@@ -62,4 +62,17 @@ test_that("Output matches manual single measurement solution", {
   expect_equal(retrieval$tbHcost[4], sol2$cf_tbH)
   expect_equal(retrieval$tbVcost[4], sol2$cf_tbV)
   expect_s3_class(retrieval,"retVOD")
+
+#
+#   vodestimates <- retrieval$vodEst
+#
+#   retrieval2 <- retVOD(h,v,
+#                       smc = seq(0.2, 0.45, length.out = 7), vod = vodestimates,
+#                       Tair = air, Tsoil = soil, cf = 0.232,
+#                       omega= 0.05, roughness = 0.1, inc_angle = 40)
+
+
+
 })
+
+
