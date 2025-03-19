@@ -42,16 +42,18 @@ retVOD <- function(tbH, tbV,
 
   ## initialize lists for the results
   results <- vector("list", length(tbH))
-  names(results) <- c(
-    "vodEst", "cfEst", "smEst",
-    "tbHpred", "tbVpred",
-    "tbHcost", "tbVcost"
-  )
+  # names(results) <- c(
+  #   "vodEst", "cfEst", "smEst",
+  #   "tbHpred", "tbVpred",
+  #   "tbHcost", "tbVcost", "res_mat"
+  # )
+
   n <- length(tbH)
+
   results <- list(
     vodEst = numeric(n), cfEst = numeric(n), smEst = numeric(n),
     tbHpred = numeric(n), tbVpred = numeric(n),
-    tbHcost = numeric(n), tbVcost = numeric(n)
+    tbHcost = numeric(n), tbVcost = numeric(n), res_mat= numeric(n)
   )
 
   # for each brightness temperature retrieve VOD and soil moisture
@@ -78,6 +80,7 @@ retVOD <- function(tbH, tbV,
     results$tbHpred[i] <- est$pred_tbH
     results$tbHcost[i] <- est$cf_tbH
     results$tbVcost[i] <- est$cf_tbV
+    results$res_mat[i] <- est$cf_mat
 
     if (!silent) {
       cli_progress_update() # Update progress bar
