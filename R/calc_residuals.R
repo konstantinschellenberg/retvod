@@ -25,6 +25,8 @@ tbResiduals <- function(tbH, tbV, tbHpred, tbVpred) {
   # cost function is the sum of the two square differences
   totaltb_res <- tbH_res + tbV_res
   rse <- sqrt(totaltb_res)
+  # Microwave polarization difference index... See work by Jeffery Walker
+  mdpi <- (tbV-tbH)/(tbV+tbH)
   # return the residuals for each polarization, the total, and sqrt(total)
   res <- structure(
     list(
