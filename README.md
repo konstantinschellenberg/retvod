@@ -30,6 +30,3 @@ This is a basic example which shows you how to solve a common problem:
 
 ## Next steps:
 
-- Input pred_H_V function and test
-
-- Write tests for tau omega and fresnelr
