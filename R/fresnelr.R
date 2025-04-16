@@ -7,13 +7,16 @@
 #' @return List of horizontal and vertical polarization reflectivity
 #' @export
 #'
-fresnelr <- function(eps, theta, h){
+fresnelr <- function(eps_real, eps_imag, theta, h){
 
-  if (Re(eps)<0|Im(eps)==0){
+  if (eps_real<0|eps_imag==0){
     stop("fresnelr: Invalid epsilon value.")
   }
 
   stopifnot(theta>0)# no negative angles
+
+  # concatenate real and imaginary parts of epsilon
+  eps <- complex(real=eps_real, imaginary=eps_imag)
 
   # theta is converted to radians
   thetar = theta*pi/180
