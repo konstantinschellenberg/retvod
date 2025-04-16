@@ -1,6 +1,7 @@
 #' Fresnel's reflectivity calculation
 #'
-#' @param eps Dielectric
+#' @param eps_real Real part of the complex dielectric constant
+#' @param eps_imag Imaginary part of the complex dielectric constant
 #' @param theta Incidence angle in degrees
 #' @param h Soil surface roughness
 #'
