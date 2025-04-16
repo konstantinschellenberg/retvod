@@ -3,7 +3,7 @@ test_that("Check output", {
   #Check that you get the expected value
   test_eps <- mironov(1.4e9, 0.4, 0.232)
 
-  reflecs <- fresnelr(test_eps$dielectric, 40, h=0.1)
+  reflecs <- fresnelr(test_eps$real, test_eps$imaginary, 40, h=0.1)
 
   # Expected values for known inputs (replace with actual known correct values)
   thetar = 40*pi/180

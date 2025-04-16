@@ -9,11 +9,11 @@
 #'
 fresnelr <- function(eps_real, eps_imag, theta, h){
 
-  if (eps_real<0|eps_imag==0){
-    stop("fresnelr: Invalid epsilon value.")
-  }
-
-  stopifnot(theta>0)# no negative angles
+  # if (eps_real<0|eps_imag==0){
+  #   stop("fresnelr: Invalid epsilon value.")
+  # }
+  #
+  # stopifnot(theta>0)# no negative angles
 
   # concatenate real and imaginary parts of epsilon
   eps <- complex(real=eps_real, imaginary=eps_imag)
