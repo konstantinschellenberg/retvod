@@ -1,23 +1,20 @@
 #' Fresnel's reflectivity calculation
 #'
-#' @param eps_real Real part of the complex dielectric constant
-#' @param eps_imag Imaginary part of the complex dielectric constant
+#' @param eps Dielectric
 #' @param theta Incidence angle in degrees
 #' @param h Soil surface roughness
 #'
 #' @return List of horizontal and vertical polarization reflectivity
 #' @export
 #'
-fresnelr <- function(eps_real, eps_imag, theta, h){
+#'
+fresnelr <- function(eps, theta, h){
 
-  # if (eps_real<0|eps_imag==0){
-  #   stop("fresnelr: Invalid epsilon value.")
-  # }
-  #
-  # stopifnot(theta>0)# no negative angles
+  if (Re(eps)<0|Im(eps)==0){
+    stop("fresnelr: Invalid epsilon value.")
+  }
 
-  # concatenate real and imaginary parts of epsilon
-  eps <- complex(real=eps_real, imaginary=eps_imag)
+  stopifnot(theta>0)# no negative angles
 
   # theta is converted to radians
   thetar = theta*pi/180
